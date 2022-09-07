@@ -12,27 +12,33 @@
 class Solution {
 public:
     vector<int> preorderTraversal(TreeNode* root) {
-        stack<TreeNode*>st;
         vector<int>preorder;
-        
-        if(root==NULL)
-            return preorder;
-        
-        TreeNode* node;
-        st.push(root);
-        while(!st.empty()){
-            node=st.top();
-            st.pop();
-            
-            preorder.push_back(node->val);
-            
-            if(node->right)
-                st.push(node->right);
-            
-            if(node->left)
-                st.push(node->left);
+        TreeNode* curr=root;
+        while(curr!=NULL){
+            if(curr->left==NULL){
+                preorder.push_back(curr->val);
+                curr=curr->right;
+            }
+            else{
+                TreeNode* prev=curr->left;
+                //find rightmost node of left subtree
+                while(prev->right!=NULL && prev->right!=curr)
+                    prev=prev->right;
+                
+                if(prev->right==curr){
+                    //means left subtree has been visited so move right
+                    //inorder.push_back(curr->val);
+                    prev->right=NULL;//remove thread
+                    curr=curr->right;
+                }
+                else{
+                    //means we have to visit left subtree so move left
+                    preorder.push_back(curr->val);
+                    prev->right=curr;//create thread
+                    curr=curr->left;
+                }
+            }
         }
-        
         return preorder;
     }
 };
