@@ -5,39 +5,43 @@ using namespace std;
 // } Driver Code Ends
 class Solution
 {
-    private:
-    void dfs(int node, bool vis[], vector<int>adj[], stack<int>&st){
-        vis[node]=1;
-        
-        for(auto it: adj[node]){
-            if(!vis[it]){
-                dfs(it, vis, adj, st);
-            }
-        }
-        
-        st.push(node);
-    }
+    //KAHN'S ALGORITHM
+    //Topological order using BFS (modified BFS)
     
 	public:
 	//Function to return list containing vertices in Topological order. 
 	vector<int> topoSort(int V, vector<int> adj[]) 
 	{
-	    bool vis[V]={0};
-	    stack<int>st;
-	    vector<int>ans;
-	    
-	    for(int i=0;i<V;i++){
-	        if(!vis[i]){
-	            dfs(i, vis, adj, st);
+	    int indeg[V]={0};
+	    for(int i=0;i<V;i++){//for all vertices
+	        for(auto it:adj[i]){//no of adjacent nodes
+	            indeg[it]++;
 	        }
 	    }
 	    
-	    while(!st.empty()){
-	        ans.push_back(st.top());
-	        st.pop();
+	    //push all nodes with 0 indegree to queue
+	    queue<int>q;
+	    for(int i=0;i<V;i++){
+	        if(indeg[i]==0) q.push(i);
 	    }
 	    
-	    return ans;
+	    //store topological order
+	    vector<int>topo;
+	    while(!q.empty()){
+	        int node=q.front();
+	        q.pop();
+	        
+	        topo.push_back(node);
+	        
+	        for(auto it:adj[node]){
+	            //decreasing indegree by one of 
+	            //all nodes adjacent to node being removed from queue
+	            indeg[it]--;
+	            if(indeg[it]==0) q.push(it);
+	        }
+	    }
+	    
+	    return topo;
 	}
 };
 
