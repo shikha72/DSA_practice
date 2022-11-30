@@ -9,49 +9,42 @@ using namespace std;
 // User function Template for C++
 
 class Solution {
-  private:
-    bool dfs(int node, int vis[], int pathvis[], int check[], vector<int> adj[]){
-        vis[node]=1;
-        pathvis[node]=1;
-        check[node]=0;
-        
-        //return true means if cycle detected
-        for(auto it: adj[node]){
-            if(!vis[it]){
-                if(dfs(it, vis, pathvis, check, adj)==true){
-                    check[node]=0;
-                    return true;
-                }
-            }
-            else if(pathvis[it]){
-                check[node]=0;
-                return true;
-            }
-        }
-        
-        check[node]=1;
-        pathvis[node]=0;
-        return false;
-    }  
   public:
     vector<int> eventualSafeNodes(int V, vector<int> adj[]) {
-        int vis[V]={0};
-        int pathvis[V]={0};
-        int check[V]={0};
+        vector<int>revadj[V];
+        int indeg[V]={0};
         
-        vector<int>safenodes;
-        
+        //reversing edges
         for(int i=0;i<V;i++){
-            if(!vis[i])
-            dfs(i, vis, pathvis, check, adj);
+            for(auto it:adj[i]){
+                revadj[it].push_back(i);
+                indeg[i]++;
+            }
         }
         
+        //push terminal nodes to Q
+        queue<int>q;
         for(int i=0;i<V;i++){
-            if(check[i]==1)
-            safenodes.push_back(i);
+            if(indeg[i]==0)
+            q.push(i);
         }
         
-        return safenodes;
+        vector<int>ans;
+        while(!q.empty()){
+            int node=q.front();
+            q.pop();
+            
+            ans.push_back(node);
+            
+            for(auto it:revadj[node]){
+                indeg[it]--;
+                if(indeg[it]==0)
+                q.push(it);
+            }
+        }
+        
+        sort(ans.begin(), ans.end());
+        return ans;
     }
 };
 
